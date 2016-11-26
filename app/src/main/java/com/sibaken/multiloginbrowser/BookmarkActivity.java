@@ -3,51 +3,59 @@ package com.sibaken.multiloginbrowser;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class BookmarkActivity extends Activity {
 
-    private WebView myWebView;
+    //前画面からのブックマークリスト受け取り用変数用意
+    ArrayList<String> BookmarkList_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_window1);
+        setContentView(R.layout.activity_bookmark);
 
-        Button btn_test_back = (Button) findViewById(R.id.test_back);
-        btn_test_back.setOnClickListener(btn_testBackListener);
+        //前画面からデータを受け取る
+        Intent intent = getIntent();
+        BookmarkList_title = intent.getStringArrayListExtra("BookmarkList_title");
 
-        myWebView = (WebView) findViewById(R.id.webView);
-        myWebView.setWebViewClient(new WebViewClient());
-        myWebView.getSettings().setUseWideViewPort(true);
-        myWebView.getSettings().setJavaScriptEnabled(true);
-        myWebView.getSettings().setLoadWithOverviewMode(true);
-        myWebView.loadUrl("https://www.google.com/");
+        //リストビューのレイアウトを設定
+        ArrayAdapter<String> Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, BookmarkList_title);
+
+        //リストビューの設定
+        ListView BookmarkListView = (ListView) findViewById(R.id.BookmarkListView);
+        BookmarkListView.setAdapter(Adapter);
+
+        //リストがクリックされたときに呼ばれるリスナーを登録
+        BookmarkListView.setOnItemClickListener(new ListViewClickListener());
     }
 
-    View.OnClickListener btn_testBackListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            if (myWebView.canGoBack()) {
-                myWebView.goBack();
-            }
-        }
-    };
+    //リストがクリックされたときに呼ばれるリスナー
+    public class ListViewClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //リストに表示していたアイテム名をトーストで表示
+            String text = (String)parent.getItemAtPosition(position);
+            Toast.makeText(BookmarkActivity.this, text, Toast.LENGTH_SHORT).show();
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode != KeyEvent.KEYCODE_BACK) {
-            return super.onKeyDown(keyCode, event);
-        } else {
-            if (myWebView.canGoBack()) {
-                myWebView.goBack();
-            } else {
-                return super.onKeyDown(keyCode, event);
-            }
-            return false;
+            // インテントの生成
+            Intent intent = new Intent();
+            //押されたリストの場所のポジションを返す設定
+            intent.putExtra("BookmarkList_position", position);
+            // 返却したい結果ステータスをセットする
+            setResult( Activity.RESULT_OK, intent );
+            // アクティビティを終了させる（前画面に戻る遷移）
+            finish();
         }
     }
 }

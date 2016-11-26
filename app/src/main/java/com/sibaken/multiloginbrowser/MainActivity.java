@@ -50,6 +50,8 @@ public class MainActivity extends Activity {
     static final String LOG_TAG = "MLB";
     //ブックマークファイルへのファイルパスを指定する
     public static final String BOOKMARK_LIST_FILENAME = "BookmarkList.txt";
+    //ブックマークアクティビティとのやり取り用のリクエストコード
+    static final int REQUEST_CODE_BOOKMARK = 1;
 
     WebView Browser;                     //ブラウザ
     EditText AddressBar;                //アドレスバー
@@ -211,12 +213,19 @@ public class MainActivity extends Activity {
 
         //ブックマークメニューボタン処理
         protected void BookmarkMenu () {
+
+            //ブックマークのタイトルだけを抽出する
+            ArrayList<String> BookmarkList_title = new ArrayList<String>();
+            for(BookmarkInfo BookmarkObj : BookmarkList) {
+                BookmarkList_title.add(BookmarkObj.GetTitle());
+            }
+
             //ブックマークアクティビティへの移動を設定
-//            Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
+            Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             //ブックマークリストをアクティビティへ転送設定
-//            intent.putExtra("BookMark", BookmarkList);
-            //画面遷移実行
-//            startActivity(intent);
+            intent.putExtra("BookmarkList_title", BookmarkList_title);
+            //画面遷移実行（返却値を考慮したActivityの起動を行う）
+            startActivityForResult(intent, REQUEST_CODE_BOOKMARK);
         }
     }
 
@@ -286,5 +295,24 @@ public class MainActivity extends Activity {
         }
         //該当のRULがなければnullを返却
         return null;
+    }
+
+    //前画面から復帰するときに呼ばれるメソッド
+    @Override
+    public void onActivityResult( int requestCode, int resultCode, Intent intent ) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // startActivityForResult()の際に指定したリクエストコードとの比較
+        switch (requestCode) {
+            //ブックマークアクティビティ
+            case REQUEST_CODE_BOOKMARK:
+                // 返却結果ステータスが正常なら
+                if( Activity.RESULT_OK == resultCode ){
+                    // 返却されてきたintentから値を取り出す
+                    int position = intent.getIntExtra("BookmarkList_position", -1);
+                    Browser.loadUrl(BookmarkList.get(position).GetUrl());
+                }
+                break;
+        }
     }
 }
