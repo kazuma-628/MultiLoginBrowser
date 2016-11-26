@@ -1,5 +1,6 @@
 package com.sibaken.multiloginbrowser;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +10,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 
-public class Window1Activity extends AppCompatActivity {
+public class BookmarkActivity extends Activity {
 
     private WebView myWebView;
 

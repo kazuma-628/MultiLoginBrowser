@@ -30,19 +30,32 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
+    //ブックマーク情報を保持するクラス
+    public class BookmarkInfo{
+        //コンストラクタ
+        public BookmarkInfo(String p_title, String p_Url){
+            Title = p_title;  //タイトルを保持
+            Url = p_Url;      //URLを保持
+        }
+
+        //データ取得IF
+        public String GetTitle(){ return Title; }
+        public String GetUrl(){ return Url; }
+
+        private String Title;  //タイトル
+        private String Url;    //URL
+    }
+
     //Android タグ名
     static final String LOG_TAG = "MLB";
     //ブックマークファイルへのファイルパスを指定する
     public static final String BOOKMARK_LIST_FILENAME = "BookmarkList.txt";
 
-    //ブラウザ
-    WebView Browser;
-    //アドレスバー
-    EditText AddressBar;
-    //ブックマークリスト
-    ArrayList<String> BookmarkList;
-    //ブックマークボタン
-    Button BookmarkButton;
+    WebView Browser;                     //ブラウザ
+    EditText AddressBar;                //アドレスバー
+    ArrayList<BookmarkInfo> BookmarkList;     //ブックマークリスト
+    Button BookmarkButton;              //ブックマークボタン
+    Button BookmarkMenuButton;         //ブックマークメニューボタン
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +73,13 @@ public class MainActivity extends Activity {
         //////////////////////////////////////////
         // ボタンに関する初期処理
 
+        //ブックマークボタン
         BookmarkButton = (Button)findViewById(R.id.Bookmark);
         BookmarkButton.setOnClickListener(new ButtonListener());
 
+        //ブックマークメニューボタン
+        BookmarkMenuButton = (Button) findViewById(R.id.BookmarkMenu);
+        BookmarkMenuButton.setOnClickListener(new ButtonListener());
 
         //////////////////////////////////////////
         // ブラウザに関する初期処理
@@ -81,10 +98,11 @@ public class MainActivity extends Activity {
         Browser.loadUrl("http://www.yahoo.co.jp/");
 
         //ブックマークのリストを作成
-        BookmarkList = new ArrayList<String>();
+        BookmarkList = new ArrayList<BookmarkInfo>();
 
         //////////////////////////////////////////
         // ブックマークに関する初期処理
+
 
         //ブックマークのデータをファイルから読み込み
         try {
@@ -93,11 +111,22 @@ public class MainActivity extends Activity {
             //文字コードを指定してオープン
             BufferedReader Reader = new BufferedReader(new InputStreamReader(File, "UTF-8"));
 
-            //1行ごとにURLを取り出す（最後の行まで）
-            String UrlString;
-            while ((UrlString = Reader.readLine()) != null) {
-                //データが存在した場合は、アプリ内で管理するブックマークリストに追加
-                BookmarkList.add(UrlString);
+            //2行ごとにタイトル・URLを取り出す（すべて取り出す）
+            //1行目がタイトル、2行目がURL
+            String TitleString;
+            while ((TitleString = Reader.readLine()) != null) {
+                //タイトルがあればURLも取り出す
+                String UrlString = Reader.readLine();
+
+                //URLもあるはずだが念のためチェック
+                if(UrlString != null) {
+                    //データが存在した場合は、アプリ内で管理するブックマークリストに追加
+                    BookmarkList.add(new BookmarkInfo(TitleString, UrlString));
+                }
+                //あるはずのデータがなけれなエラー
+                else {
+                    Log.e(LOG_TAG, "Not UrlString!");
+                }
             }
 
             //後処理（オープンしたファイルのクローズなど）
@@ -122,7 +151,7 @@ public class MainActivity extends Activity {
 
             //ブックマークボタンの表示を更新
             //すでにブックマークされている要素だった場合
-            if (-1 == BookmarkList.indexOf(url)) {
+            if (null == GetBookmarkList(url)) {
                 BookmarkButton.setText("☆");
             }
             else {
@@ -139,24 +168,28 @@ public class MainActivity extends Activity {
 
             //押されたボタンごとに処理を分ける
             switch (v.getId()) {
+                //ブックマークボタン
                 case R.id.Bookmark:
                     Bookmark();
                     break;
+                //ブックマークメニューボタン
+                case R.id.BookmarkMenu:
+                    BookmarkMenu();
             }
         }
 
         //ブックマークボタン処理
         protected void Bookmark () {
-            Log.i(LOG_TAG, "BookmarkButtonListener onClick : ");
-            //アドレスバーからURLの文字列を取り出す
-            String UrlString = AddressBar.getText().toString();
-            //ブックマークリストにURLが既に存在するかを検索
-            int ListIndex = BookmarkList.indexOf(UrlString);
+            Log.i(LOG_TAG, "BookmarkButtonListener Bookmark");
+            //現在表示中のアドレスを取得
+            String UrlString = Browser.getUrl();
+            //URLからブックマークリストにあるデータを取得
+            BookmarkInfo BookmarkObj = GetBookmarkList(UrlString);
 
-            //ブックマークされていない場合は新規追加（リストのインデックス値がなければ存在しない）
-            if (-1 == ListIndex) {
-                //ブックマークリストにデータを追加
-                BookmarkList.add(UrlString);
+            //ブックマークされていない場合は新規追加（nullであればデータが存在しない）
+            if (null == BookmarkObj) {
+                //ブックマークリストにページタイトルとURLを追加
+                BookmarkList.add(new BookmarkInfo(Browser.getTitle(), UrlString));
                 //登録を完了したことを知らせるトーストを表示
                 Toast.makeText(MainActivity.this, "ブックマークに追加", Toast.LENGTH_SHORT).show();
                 //ブックマークボタンの表示を更新
@@ -164,9 +197,9 @@ public class MainActivity extends Activity {
             }
             //既に存在する場合はリストから削除
             else {
-                //ブックマークリストにデータを削除
-                BookmarkList.remove(ListIndex);
-                //重複していることを知らせるトーストを表示
+                //ブックマークリストからデータを削除
+                BookmarkList.remove(BookmarkObj);
+                //削除したことをトーストで表示
                 Toast.makeText(MainActivity.this, "ブックマークから削除", Toast.LENGTH_SHORT).show();
                 //ブックマークボタンの表示を更新
                 BookmarkButton.setText("☆");
@@ -176,27 +209,14 @@ public class MainActivity extends Activity {
             FileWriteBookmarkList();
         }
 
-        //ブックマークリストデータをファイルに書き込み
-        protected void FileWriteBookmarkList ( ) {
-            Log.i(LOG_TAG, "BookmarkButtonListener FileWriteBookmarkList : ");
-            try {
-                //ファイルのオープン（追記指定）
-                FileOutputStream BookmarkListFile = openFileOutput(BOOKMARK_LIST_FILENAME, Context.MODE_APPEND);
-                //文字コードを指定して書き込み実行
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(BookmarkListFile, "UTF-8"));
-
-                //ブックマークリストを全部書き込む
-                for(String UrlString : BookmarkList){
-                    writer.append(UrlString);
-                }
-                //後処理（オープンしたファイルなどをクローズ）
-                writer.close();
-                BookmarkListFile.close();
-
-                //エラーが起きた時の例外処理
-            } catch (FileNotFoundException e) {
-            } catch (IOException e) {
-            }
+        //ブックマークメニューボタン処理
+        protected void BookmarkMenu () {
+            //ブックマークアクティビティへの移動を設定
+//            Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
+            //ブックマークリストをアクティビティへ転送設定
+//            intent.putExtra("BookMark", BookmarkList);
+            //画面遷移実行
+//            startActivity(intent);
         }
     }
 
@@ -228,4 +248,43 @@ public class MainActivity extends Activity {
         }
     }
 
+    //ブックマークリストデータをファイルに書き込み
+    public void FileWriteBookmarkList ( ) {
+        Log.i(LOG_TAG, "BookmarkButtonListener FileWriteBookmarkList");
+        try {
+            //ファイルのオープン（追記指定）
+            FileOutputStream BookmarkListFile = openFileOutput(BOOKMARK_LIST_FILENAME, Context.MODE_PRIVATE);
+            //文字コードを指定して書き込み実行
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(BookmarkListFile, "UTF-8"));
+
+            //ブックマークリストを全部書き込む
+            for(BookmarkInfo BookmarkObj : BookmarkList){
+                //タイトルとURLを1行ごとに格納（2行で1セット）
+                writer.append(BookmarkObj.GetTitle() + "\n");
+                writer.append(BookmarkObj.GetUrl() + "\n");
+            }
+            //後処理（オープンしたファイルなどをクローズ）
+            writer.close();
+            BookmarkListFile.close();
+
+            //エラーが起きた時の例外処理
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
+    }
+
+    //対象のURLが含まれるブックマークリストオブジェクトを取得
+    protected BookmarkInfo GetBookmarkList ( String Url ) {
+        Log.i(LOG_TAG, "BookmarkButtonListener FindBookmarkListToUrl");
+
+        //ブックマークリストを全検索
+        for(BookmarkInfo BookmarkObj : BookmarkList) {
+            //URLで一致するものがあればオブジェクトを返却
+            if(true == Url.equals(BookmarkObj.GetUrl())) {
+                return BookmarkObj;
+            }
+        }
+        //該当のRULがなければnullを返却
+        return null;
+    }
 }

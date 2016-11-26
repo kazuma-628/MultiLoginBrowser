@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/button10">
+        android:layout_below="@+id/BookmarkMenu">
 
     </WebView>
 
@@ -70,7 +70,7 @@
         android:text="Book"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:id="@+id/button10"
+        android:id="@+id/BookmarkMenu"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/button3"
         android:layout_toStartOf="@+id/button3" />
@@ -80,8 +80,8 @@
         android:layout_height="40dp"
         android:id="@+id/Bookmark"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/button10"
-        android:layout_toStartOf="@+id/button10"
+        android:layout_toLeftOf="@+id/BookmarkMenu"
+        android:layout_toStartOf="@+id/BookmarkMenu"
         android:layout_width="40dp" />
 
     <Button

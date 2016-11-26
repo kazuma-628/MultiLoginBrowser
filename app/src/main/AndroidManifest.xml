@@ -20,8 +20,8 @@
 
         <!-- Window1アクティビティ -->
         <activity
-            android:name="Window1Activity"
-            android:label="MLBwindow1" >
+            android:name="BookmarkActivity"
+            android:label="BookmarkActivity" >
         </activity>
     </application>
 
