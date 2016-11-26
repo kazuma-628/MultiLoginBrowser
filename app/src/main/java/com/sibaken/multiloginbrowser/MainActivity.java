@@ -50,8 +50,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.inject(this);
-
         //起動時にキーボードを表示しない
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -124,47 +122,63 @@ public class MainActivity extends Activity {
 
             //ブックマークボタンの表示を更新
             //すでにブックマークされている要素だった場合
-            if (-1 != BookmarkList.indexOf(url)) {
-                BookmarkButton.setText("★");
+            if (-1 == BookmarkList.indexOf(url)) {
+                BookmarkButton.setText("☆");
             }
             else {
-                BookmarkButton.setText("☆");
+                BookmarkButton.setText("★");
             }
         }
     }
 
 
-    //ボタンが押されたときに処理するクラス
+    //ブックマークボタンが押されたときに処理するクラス
     public class ButtonListener implements View.OnClickListener {
-        public void onClick(View v){
-            Log.i(LOG_TAG, "ButtonListener onClick : ");
+        public void onClick(View v) {
+            Log.i(LOG_TAG, "ButtonListener onClick");
+
+            //押されたボタンごとに処理を分ける
+            switch (v.getId()) {
+                case R.id.Bookmark:
+                    Bookmark();
+                    break;
+            }
+        }
+
+        //ブックマークボタン処理
+        protected void Bookmark () {
+            Log.i(LOG_TAG, "BookmarkButtonListener onClick : ");
             //アドレスバーからURLの文字列を取り出す
             String UrlString = AddressBar.getText().toString();
+            //ブックマークリストにURLが既に存在するかを検索
+            int ListIndex = BookmarkList.indexOf(UrlString);
 
-            //ブックマークされている要素だった場合は削除
-            if (-1 != BookmarkList.indexOf(UrlString)) {
-                //重複していることを知らせるトーストを表示
-                Toast.makeText(MainActivity.this, "ブックマークから削除", Toast.LENGTH_SHORT).show();
-                //ブックマークボタンの表示を更新
-                BookmarkButton.setText("☆");
-            }
-            //そうでない場合は新規追加
-            else {
+            //ブックマークされていない場合は新規追加（リストのインデックス値がなければ存在しない）
+            if (-1 == ListIndex) {
                 //ブックマークリストにデータを追加
                 BookmarkList.add(UrlString);
-
                 //登録を完了したことを知らせるトーストを表示
                 Toast.makeText(MainActivity.this, "ブックマークに追加", Toast.LENGTH_SHORT).show();
                 //ブックマークボタンの表示を更新
                 BookmarkButton.setText("★");
-
-                //ブックマークをファイルに書き込む
-                FileWriteBookmarkList();
             }
+            //既に存在する場合はリストから削除
+            else {
+                //ブックマークリストにデータを削除
+                BookmarkList.remove(ListIndex);
+                //重複していることを知らせるトーストを表示
+                Toast.makeText(MainActivity.this, "ブックマークから削除", Toast.LENGTH_SHORT).show();
+                //ブックマークボタンの表示を更新
+                BookmarkButton.setText("☆");
+
+            }
+            //ブックマークをファイルに書き込む
+            FileWriteBookmarkList();
         }
 
         //ブックマークリストデータをファイルに書き込み
         protected void FileWriteBookmarkList ( ) {
+            Log.i(LOG_TAG, "BookmarkButtonListener FileWriteBookmarkList : ");
             try {
                 //ファイルのオープン（追記指定）
                 FileOutputStream BookmarkListFile = openFileOutput(BOOKMARK_LIST_FILENAME, Context.MODE_APPEND);
@@ -189,7 +203,7 @@ public class MainActivity extends Activity {
     //キーが押下されたときの動作
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
+        Log.i(LOG_TAG, "onKeyDown : " + keyCode);
         //バックキーが押されたとき
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             //ブラウザが前に戻れるか判定
