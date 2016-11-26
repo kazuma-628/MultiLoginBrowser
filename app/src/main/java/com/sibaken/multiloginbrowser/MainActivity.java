@@ -103,8 +103,27 @@ public class MainActivity extends Activity {
         BookmarkList = new ArrayList<BookmarkInfo>();
 
         //////////////////////////////////////////
-        // ブックマークに関する初期処理
+        // アドレスバーに関する初期処理
+        
+        AddressBar.setOnKeyListener( new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                //ボタンが押されてなおかつエンターキーだったとき
+                if((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                    // ソフトキーボードを隠す
+                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(v.getWindowToken(), 0);
 
+                    //アドレスバーのテキスト内容を取得して設定（表示）
+                    Editable Text = AddressBar.getText();
+                    Browser.loadUrl(Text.toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        //////////////////////////////////////////
+        // ブックマークに関する初期処理
 
         //ブックマークのデータをファイルから読み込み
         try {
@@ -240,21 +259,10 @@ public class MainActivity extends Activity {
                 //戻れるなら戻す
                 Browser.goBack();
                 return false;
-            } else {
-                return super.onKeyDown(keyCode, event);
             }
         }
-        //エンター（検索キーが押された場合）
-        //アドレスバーにフォーカスが当たっているときの判定が必要な気が？
-        else if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
-            //アドレスバーのテキスト内容を取得して設定
-            Editable Text = AddressBar.getText();
-            Browser.loadUrl(Text.toString());
-            return super.onKeyDown(keyCode, event);
-        } else {
-            //戻れない場合はアクティビティを閉じる
-            return super.onKeyDown(keyCode, event);
-        }
+        //それ以外は次にキーを流す（多分そういう意味）
+        return super.onKeyDown(keyCode, event);
     }
 
     //ブックマークリストデータをファイルに書き込み
