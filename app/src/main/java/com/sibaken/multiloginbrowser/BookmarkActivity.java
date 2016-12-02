@@ -12,13 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
+import com.sibaken.multiloginbrowser.Common.*;
+import static com.sibaken.multiloginbrowser.Common.*;
 
 public class BookmarkActivity extends Activity {
 
     //前画面からのブックマークリスト受け取り用変数用意
-    ArrayList<String> BookmarkList_title;
+    ArrayList<BookmarkInfo> BookmarkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,13 @@ public class BookmarkActivity extends Activity {
 
         //前画面からデータを受け取る
         Intent intent = getIntent();
-        BookmarkList_title = intent.getStringArrayListExtra("BookmarkList_title");
+        BookmarkList = (ArrayList<BookmarkInfo>)intent.getSerializableExtra("BookmarkList");
+
+        //ブックマークのタイトルだけを抽出する
+        ArrayList<String> BookmarkList_title = new ArrayList<String>();
+        for(BookmarkInfo BookmarkObj : BookmarkList) {
+            BookmarkList_title.add(BookmarkObj.GetTitle());
+        }
 
         //リストビューのレイアウトを設定
         ArrayAdapter<String> Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, BookmarkList_title);
@@ -50,6 +57,8 @@ public class BookmarkActivity extends Activity {
 
             // インテントの生成
             Intent intent = new Intent();
+            //ブックマークリストを前のアクティビティへ転送設定
+            intent.putExtra("BookmarkList", BookmarkList);
             //押されたリストの場所のポジションを返す設定
             intent.putExtra("BookmarkList_position", position);
             // 返却したい結果ステータスをセットする

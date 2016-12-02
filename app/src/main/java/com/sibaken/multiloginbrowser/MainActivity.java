@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
 
         //////////////////////////////////////////
         // ブックマークに関する初期処理
-        
+
         FileReadBookmarkList(MainActivity.this, BookmarkList);
     }
 
@@ -172,16 +172,10 @@ public class MainActivity extends Activity {
         //ブックマークメニューボタン処理
         protected void BookmarkMenu () {
 
-            //ブックマークのタイトルだけを抽出する
-            ArrayList<String> BookmarkList_title = new ArrayList<String>();
-            for(BookmarkInfo BookmarkObj : BookmarkList) {
-                BookmarkList_title.add(BookmarkObj.GetTitle());
-            }
-
             //ブックマークアクティビティへの移動を設定
             Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             //ブックマークリストをアクティビティへ転送設定
-            intent.putExtra("BookmarkList_title", BookmarkList_title);
+            intent.putExtra("BookmarkList", BookmarkList);
             //画面遷移実行（返却値を考慮したActivityの起動を行う）
             startActivityForResult(intent, REQUEST_CODE_BOOKMARK);
         }
@@ -216,6 +210,7 @@ public class MainActivity extends Activity {
                 // 返却結果ステータスが正常なら
                 if( Activity.RESULT_OK == resultCode ){
                     // 返却されてきたintentから値を取り出す
+                    BookmarkList = (ArrayList<BookmarkInfo>)intent.getSerializableExtra("BookmarkList");
                     int position = intent.getIntExtra("BookmarkList_position", -1);
                     Browser.loadUrl(BookmarkList.get(position).GetUrl());
                 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Common {
@@ -20,7 +21,7 @@ public class Common {
     public static final String BOOKMARK_LIST_FILENAME = "BookmarkList.txt";
 
     //ブックマーク情報を保持するクラス
-    public static class BookmarkInfo {
+    public static class BookmarkInfo implements Serializable {
         //コンストラクタ
         public BookmarkInfo(String p_title, String p_Url){
             Title = p_title;  //タイトルを保持
