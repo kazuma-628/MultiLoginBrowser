@@ -96,8 +96,8 @@ public class MainActivity extends Activity {
 
         //////////////////////////////////////////
         // ブックマークに関する初期処理
-
-
+        
+        FileReadBookmarkList(MainActivity.this, BookmarkList);
     }
 
     //ブラウザクライアントの設定
