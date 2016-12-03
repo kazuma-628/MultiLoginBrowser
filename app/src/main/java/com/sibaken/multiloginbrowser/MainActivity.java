@@ -100,7 +100,9 @@ public class MainActivity extends Activity {
         FileReadBookmarkList(MainActivity.this, BookmarkList);
     }
 
-    //ブラウザクライアントの設定
+    /**
+     * ブラウザクライアントの設定
+     */
     public class BrowserClient extends WebViewClient {
         //ページの読み込み時の処理
         @Override
@@ -121,7 +123,9 @@ public class MainActivity extends Activity {
     }
 
 
-    //ブックマークボタンが押されたときに処理するクラス
+    /**
+     * ブックマークボタンが押されたときに処理するクラス
+     */
     public class ButtonListener implements View.OnClickListener {
         public void onClick(View v) {
             Log.i(LOG_TAG, "ButtonListener onClick");
@@ -171,7 +175,6 @@ public class MainActivity extends Activity {
 
         //ブックマークメニューボタン処理
         protected void BookmarkMenu () {
-
             //ブックマークアクティビティへの移動を設定
             Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
             //ブックマークリストをアクティビティへ転送設定
@@ -181,7 +184,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    //キーが押下されたときの動作
+    /**
+     * キーが押下されたときの動作
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.i(LOG_TAG, "onKeyDown : " + keyCode);
@@ -198,7 +203,9 @@ public class MainActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-    //前画面から復帰するときに呼ばれるメソッド
+    /**
+     * 前画面から復帰するときに呼ばれるメソッド
+     */
     @Override
     public void onActivityResult( int requestCode, int resultCode, Intent intent ) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -207,10 +214,11 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             //ブックマークアクティビティ
             case REQUEST_CODE_BOOKMARK:
-                // 返却結果ステータスが正常なら
-                if( Activity.RESULT_OK == resultCode ){
-                    // 返却されてきたintentから値を取り出す
-                    BookmarkList = (ArrayList<BookmarkInfo>)intent.getSerializableExtra("BookmarkList");
+                // 返却されてきたintentから値を取り出す
+                BookmarkList = (ArrayList<BookmarkInfo>)intent.getSerializableExtra("BookmarkList");
+
+                // ブックマークリストのアイテムが選択された場合はそのブックマークのURLを表示する
+                if( ACTIVITY_RESULT_LIST_SELECT == resultCode ){
                     int position = intent.getIntExtra("BookmarkList_position", -1);
                     Browser.loadUrl(BookmarkList.get(position).GetUrl());
                 }

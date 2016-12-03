@@ -19,8 +19,12 @@ public class Common {
     static final String LOG_TAG = "MLB";
     //ブックマークファイルへのファイルパスを指定する
     public static final String BOOKMARK_LIST_FILENAME = "BookmarkList.txt";
+    public static final int ACTIVITY_RESULT_LIST_SELECT = 1;
+    public static final int ACTIVITY_RESULT_BACK = 2;
 
-    //ブックマーク情報を保持するクラス
+    /**
+     * ブックマーク情報を保持するクラス
+     */
     public static class BookmarkInfo implements Serializable {
         //コンストラクタ
         public BookmarkInfo(String p_title, String p_Url){
@@ -36,7 +40,9 @@ public class Common {
         private String Url;    //URL
     }
 
-    //ファイルからブックマークリストデータを読み込む
+    /**
+     * ファイルからブックマークリストデータを読み込む
+     */
     public static void FileReadBookmarkList ( Context context, ArrayList<BookmarkInfo> BookmarkList ) {
         Log.i(LOG_TAG, "FileReadBookmarkList");
         //ブックマークのデータをファイルから読み込み
@@ -74,7 +80,9 @@ public class Common {
         }
     }
 
-    //ブックマークリストデータをファイルに書き込み
+    /**
+     * ブックマークリストデータをファイルに書き込み
+     */
     public static void FileWriteBookmarkList ( Context context, ArrayList<BookmarkInfo> BookmarkList ) {
         Log.i(LOG_TAG, "FileWriteBookmarkList");
         try {
@@ -99,7 +107,9 @@ public class Common {
         }
     }
 
-    //対象のURLが含まれるブックマークリストオブジェクトを取得
+    /**
+     * 対象のURLが含まれるブックマークリストオブジェクトを取得
+     */
     public static BookmarkInfo GetBookmarkList ( ArrayList<BookmarkInfo> BookmarkList, String Url ) {
         Log.i(LOG_TAG, "GetBookmarkList");
 
