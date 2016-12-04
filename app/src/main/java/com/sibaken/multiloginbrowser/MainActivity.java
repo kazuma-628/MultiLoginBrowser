@@ -112,13 +112,7 @@ public class MainActivity extends Activity {
             AddressBar.setText(url);
 
             //ブックマークボタンの表示を更新
-            //すでにブックマークされている要素だった場合
-            if (null == GetBookmarkList(BookmarkList, url)) {
-                BookmarkButton.setText("☆");
-            }
-            else {
-                BookmarkButton.setText("★");
-            }
+            BookmarkButtonUpdate( );
         }
     }
 
@@ -156,8 +150,6 @@ public class MainActivity extends Activity {
                 BookmarkList.add(new BookmarkInfo(Browser.getTitle(), UrlString));
                 //登録を完了したことを知らせるトーストを表示
                 Toast.makeText(MainActivity.this, "ブックマークに追加", Toast.LENGTH_SHORT).show();
-                //ブックマークボタンの表示を更新
-                BookmarkButton.setText("★");
             }
             //既に存在する場合はリストから削除
             else {
@@ -165,10 +157,10 @@ public class MainActivity extends Activity {
                 BookmarkList.remove(BookmarkObj);
                 //削除したことをトーストで表示
                 Toast.makeText(MainActivity.this, "ブックマークから削除", Toast.LENGTH_SHORT).show();
-                //ブックマークボタンの表示を更新
-                BookmarkButton.setText("☆");
-
             }
+            //ブックマークボタンの表示を更新
+            BookmarkButtonUpdate( );
+
             //ブックマークをファイルに書き込む
             FileWriteBookmarkList(MainActivity.this, BookmarkList);
         }
@@ -222,7 +214,27 @@ public class MainActivity extends Activity {
                     int position = intent.getIntExtra("BookmarkList_position", -1);
                     Browser.loadUrl(BookmarkList.get(position).GetUrl());
                 }
+
+                //ブックマークボタンの表示を更新
+                BookmarkButtonUpdate( );
                 break;
+        }
+    }
+
+    /**
+     * ブックマークボタンの表示更新処理
+     */
+    public void BookmarkButtonUpdate( ) {
+        //現在表示中のアドレスを取得
+        String UrlString = Browser.getUrl();
+
+        //ブックマークボタンの表示を更新
+        //すでにブックマークされている要素だった場合
+        if (null == GetBookmarkList(BookmarkList, UrlString)) {
+            BookmarkButton.setText("☆");
+        }
+        else {
+            BookmarkButton.setText("★");
         }
     }
 }
