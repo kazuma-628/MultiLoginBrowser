@@ -226,7 +226,7 @@ public class MainActivity extends Activity {
      */
     public void BookmarkButtonUpdate( ) {
         //現在表示中のアドレスを取得
-        String UrlString = Browser.getUrl();
+        String UrlString = AddressBar.getText().toString();
 
         //ブックマークボタンの表示を更新
         //すでにブックマークされている要素だった場合
